@@ -1,6 +1,5 @@
 package com.matheusslr.springsecurity.controller;
 
-import com.matheusslr.springsecurity.domain.Role;
 import com.matheusslr.springsecurity.domain.User;
 import com.matheusslr.springsecurity.dto.security.AccountCredentials;
 import com.matheusslr.springsecurity.dto.security.TokenDTO;
@@ -12,12 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -36,7 +31,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody AccountCredentials credentials) {
         var user = userRepository.findByUsername(credentials.getUsername());
-        if(user == null) {
+        if (user == null) {
             var role = roleRepository.findByDescription("ROLE_USER");
             var userSaved = User.builder()
                     .username(credentials.getUsername())
@@ -50,8 +45,7 @@ public class AuthController {
 
             userRepository.save(userSaved);
             return ResponseEntity.ok("User Registered!");
-        }
-        else {
+        } else {
             return new ResponseEntity("Username already taken!", HttpStatus.BAD_REQUEST);
         }
     }
@@ -72,5 +66,22 @@ public class AuthController {
         } else {
             return new ResponseEntity<>("Invalid username/password!", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PutMapping("/refresh/{username}")
+    public ResponseEntity refresh(
+            @PathVariable(value = "username") String username,
+            @RequestHeader("Authorization") String refreshToken
+            ) {
+        var user = userRepository.findByUsername(username);
+
+        if(user == null)
+            return new ResponseEntity("Username do not exist", HttpStatus.BAD_REQUEST);
+
+        var token = jwtTokenProvider.refreshToken(refreshToken);
+
+        if(token == null)
+            return new ResponseEntity<>("Invalid request", HttpStatus.BAD_REQUEST);
+        return ResponseEntity.ok(token);
     }
 }

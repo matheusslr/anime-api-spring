@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.matheusslr.springsecurity.domain.Role;
 import com.matheusslr.springsecurity.dto.security.TokenDTO;
+import com.matheusslr.springsecurity.repository.RoleRepository;
 import com.matheusslr.springsecurity.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,9 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class JwtTokenProvider {
@@ -26,6 +25,8 @@ public class JwtTokenProvider {
     private Long expireTimeInMilli;
     @Autowired
     private UserService userService;
+    @Autowired
+    private RoleRepository roleRepository;
 
     public TokenDTO createAccessToken(String username, List<Role> roles) {
         Date now = new Date();
@@ -48,7 +49,13 @@ public class JwtTokenProvider {
         DecodedJWT decodedJWT = decodedToken(formattedToken);
 
         String username = decodedJWT.getSubject();
-        List<Role> roles = decodedJWT.getClaim("roles").asList(Role.class);
+        var rolesAsString = decodedJWT.getClaim("roles").asList(String.class);
+        List<Role> roles = new ArrayList<>();
+
+        for(String role : rolesAsString){
+            roles.add(roleRepository.findByDescription(role));
+        }
+
         return createAccessToken(username, roles);
     }
 
