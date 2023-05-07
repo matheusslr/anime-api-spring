@@ -27,32 +27,34 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-//    @PostMapping("/register")
-//    public ResponseEntity register(@RequestBody AccountCredentials credentials) {
-//        var user = userRepository.findByUsername(credentials.getUsername());
-//        if(user == null) {
-//            var role = roleRepository.findByDescription("ROLE_USER");
-//            var userSaved = User.builder()
-//                    .username(credentials.getUsername())
-//                    .password(new BCryptPasswordEncoder().encode(credentials.getPassword()))
-//                    .roles(List.of(role))
-//                    .isAccountNonExpired(true)
-//                    .isCredentialsNonExpired(true)
-//                    .isAccountNonLocked(true)
-//                    .isEnabled(true)
-//                    .build();
-//
-//            userRepository.save(userSaved);
-//            return ResponseEntity.ok("User Registered!");
-//        }
-//        else {
-//            return new ResponseEntity("Username already taken!", HttpStatus.BAD_REQUEST);
-//        }
-//    }
+    @PostMapping("/register")
+    public ResponseEntity register(@RequestBody AccountCredentials credentials) {
+        var user = userRepository.findByUsername(credentials.getUsername());
+        if(user == null) {
+            var role = roleRepository.findByDescription("ROLE_USER");
+            var userSaved = User.builder()
+                    .username(credentials.getUsername())
+                    .password(new BCryptPasswordEncoder().encode(credentials.getPassword()))
+                    .roles(List.of(role))
+                    .isAccountNonExpired(true)
+                    .isCredentialsNonExpired(true)
+                    .isAccountNonLocked(true)
+                    .isEnabled(true)
+                    .build();
+
+            userRepository.save(userSaved);
+            return ResponseEntity.ok("User Registered!");
+        }
+        else {
+            return new ResponseEntity("Username already taken!", HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @PostMapping("/signin")
     public ResponseEntity signin(@RequestBody AccountCredentials accountCredentials) {
