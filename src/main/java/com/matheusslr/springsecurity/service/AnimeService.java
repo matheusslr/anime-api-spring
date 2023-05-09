@@ -45,4 +45,20 @@ public class AnimeService {
         Anime animeToDelete = findById(id);
         animeRepository.delete(animeToDelete);
     }
+
+    public Anime update(AnimeDTO anime){
+        Anime animeToUpdate = findById(anime.getId());
+        if(animeToUpdate != null) {
+            var producer = producerRepository.findById(anime.getId_producer())
+                    .orElseThrow(() -> new NullPointerException("Producer from anime not found"));
+
+            animeToUpdate.setName(anime.getName());
+            animeToUpdate.setProducer(producer);
+            animeToUpdate.setDescription(anime.getDescription());
+            return animeRepository.save(animeToUpdate);
+        }
+        else{
+            throw new NullPointerException("Anime not found");
+        }
+    }
 }
