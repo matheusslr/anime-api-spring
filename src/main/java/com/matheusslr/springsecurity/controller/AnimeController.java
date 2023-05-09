@@ -6,6 +6,8 @@ import com.matheusslr.springsecurity.service.AnimeService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +22,9 @@ public class AnimeController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<Anime>> findAll(
+    public ResponseEntity<PagedModel<EntityModel<Anime>>> findAll(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "5") Integer size
+            @RequestParam(value = "size", defaultValue = "1") Integer size
             ) {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(animeService.findAll(pageable));

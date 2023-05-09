@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.hateoas.RepresentationModel;
 
 @Entity
 @Table(name = "tb_anime")
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
-public class Anime {
+public class Anime extends RepresentationModel<Anime> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
