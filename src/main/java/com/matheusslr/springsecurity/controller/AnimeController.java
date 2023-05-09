@@ -24,7 +24,7 @@ public class AnimeController {
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<Anime>>> findAll(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "1") Integer size
+            @RequestParam(value = "size", defaultValue = "2") Integer size
             ) {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(animeService.findAll(pageable));

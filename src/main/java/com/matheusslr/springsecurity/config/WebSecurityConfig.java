@@ -37,6 +37,7 @@ public class WebSecurityConfig {
                             auth.requestMatchers(HttpMethod.POST, "/auth/register").hasAnyRole("ADMIN", "MANAGER");
                             auth.requestMatchers(HttpMethod.GET, "/h2-console/**").hasRole("ADMIN");
                             auth.requestMatchers(HttpMethod.DELETE, "/animes/**").hasRole("ADMIN");
+                            auth.requestMatchers(HttpMethod.PUT, "/animes").hasAnyRole("ADMIN", "MANAGER");
                             auth.anyRequest().authenticated();
                         })
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
