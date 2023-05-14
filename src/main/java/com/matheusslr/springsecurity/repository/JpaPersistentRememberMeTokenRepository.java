@@ -1,7 +1,9 @@
 package com.matheusslr.springsecurity.repository;
 
 import com.matheusslr.springsecurity.domain.RememberMeToken;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.security.web.authentication.rememberme.PersistentRememberMeToken;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.stereotype.Repository;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Date;
 
 @Repository
+@Log4j2
 public class JpaPersistentRememberMeTokenRepository implements PersistentTokenRepository {
     @Autowired
     private RememberMeTokenRepository tokenRepository;
@@ -36,17 +39,28 @@ public class JpaPersistentRememberMeTokenRepository implements PersistentTokenRe
 
     @Override
     public PersistentRememberMeToken getTokenForSeries(String seriesId) {
-        RememberMeToken rememberMeToken = tokenRepository.findById(Long.valueOf(seriesId)).get();
-        if (rememberMeToken != null) {
-            return new PersistentRememberMeToken(rememberMeToken.getUsername(), rememberMeToken.getUsername(), rememberMeToken.getTokenValue(), rememberMeToken.getCreateAt());
+        try {
+            RememberMeToken rememberMeToken = tokenRepository.findById(Long.valueOf(seriesId))
+                    .orElse(null);
+            if (rememberMeToken != null) {
+                return new PersistentRememberMeToken(
+                        rememberMeToken.getUsername(),
+                        seriesId,
+                        rememberMeToken.getTokenValue(),
+                        rememberMeToken.getCreateAt());
+            }
+        }catch (InvalidDataAccessApiUsageException e){
+            log.info("Invalid format token or cannot find in database");
         }
-        return null;
+        finally {
+            return null;
+        }
     }
 
     @Override
     public void removeUserTokens(String username) {
         RememberMeToken rememberMeToken = tokenRepository.findByUsername(username);
-        if(rememberMeToken != null)
+        if (rememberMeToken != null)
             tokenRepository.delete(rememberMeToken);
     }
 }

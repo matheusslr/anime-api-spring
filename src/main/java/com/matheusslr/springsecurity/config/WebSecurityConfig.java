@@ -27,9 +27,11 @@ public class WebSecurityConfig {
                 .and()
                 .authorizeHttpRequests(
                         auth -> {
+                            auth.requestMatchers("/swagger-ui/**").permitAll();
                             auth.requestMatchers(HttpMethod.GET, "/h2-console/**").hasRole("ADMIN");
                             auth.requestMatchers(HttpMethod.POST, "/auth/register").hasAnyRole("ADMIN", "MANAGER");
                             auth.requestMatchers(HttpMethod.DELETE, "/animes/**").hasRole("ADMIN");
+                            auth.requestMatchers(HttpMethod.POST, "/animes").hasAnyRole("ADMIN", "MANAGER");
                             auth.anyRequest().authenticated();
                         })
                 .formLogin(Customizer.withDefaults())
