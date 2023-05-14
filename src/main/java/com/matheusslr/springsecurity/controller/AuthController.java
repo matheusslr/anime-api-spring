@@ -1,11 +1,18 @@
 package com.matheusslr.springsecurity.controller;
 
+import com.matheusslr.springsecurity.domain.Anime;
 import com.matheusslr.springsecurity.domain.User;
 import com.matheusslr.springsecurity.dto.security.AccountCredentials;
 import com.matheusslr.springsecurity.dto.security.TokenDTO;
 import com.matheusslr.springsecurity.repository.RoleRepository;
 import com.matheusslr.springsecurity.repository.UserRepository;
 import com.matheusslr.springsecurity.security.JwtTokenProvider;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +25,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Authentication endpoint")
 public class AuthController {
     @Autowired
     private UserRepository userRepository;
@@ -28,6 +36,18 @@ public class AuthController {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
+    @Operation(
+            summary = "Register a common user",
+            description = "Register a user with low-level access credentials",
+            tags = "Authentication endpoint",
+            responses = {
+                    @ApiResponse(description = "Success", responseCode = "200", content = @Content),
+                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+                    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
+                    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)
+            }
+    )
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody AccountCredentials credentials) {
         var user = userRepository.findByUsername(credentials.getUsername());
@@ -50,6 +70,23 @@ public class AuthController {
         }
     }
 
+    @Operation(
+            summary = "Authenticates a user",
+            description = "Authenticates a user and returns a token",
+            tags = "Authentication endpoint",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200",
+                            content = {@Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = TokenDTO.class))
+                            )}),
+                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+                    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)
+            }
+    )
     @PostMapping("/signin")
     public ResponseEntity signin(@RequestBody AccountCredentials accountCredentials) {
         String username = accountCredentials.getUsername();
@@ -68,19 +105,36 @@ public class AuthController {
         }
     }
 
+    @Operation(
+            summary = "Refresh token",
+            description = "Refresh token for authenticated user and returns a new token",
+            tags = "Authentication endpoint",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200",
+                            content = {@Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = TokenDTO.class))
+                            )}),
+                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+                    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content)
+            }
+    )
     @PutMapping("/refresh/{username}")
     public ResponseEntity refresh(
             @PathVariable(value = "username") String username,
             @RequestHeader("Authorization") String refreshToken
-            ) {
+    ) {
         var user = userRepository.findByUsername(username);
 
-        if(user == null)
+        if (user == null)
             return new ResponseEntity("Username do not exist", HttpStatus.BAD_REQUEST);
 
         var token = jwtTokenProvider.refreshToken(refreshToken);
 
-        if(token == null)
+        if (token == null)
             return new ResponseEntity<>("Invalid request", HttpStatus.BAD_REQUEST);
         return ResponseEntity.ok(token);
     }
