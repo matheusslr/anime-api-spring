@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -125,8 +126,13 @@ public class AuthController {
     @PutMapping("/refresh/{username}")
     public ResponseEntity refresh(
             @PathVariable(value = "username") String username,
-            @RequestHeader("Authorization") String refreshToken
+            @RequestHeader("Authorization") String refreshToken,
+            Authentication authentication
     ) {
+        String currentUsername = authentication.getName();
+        if(!currentUsername.equals(username))
+            return new ResponseEntity("You are not authorized to update another user's token", HttpStatus.FORBIDDEN);
+
         var user = userRepository.findByUsername(username);
 
         if (user == null)
