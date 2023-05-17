@@ -1,4 +1,4 @@
-# Spring Security (Anime API)
+# Anime API (spring-security)
 O spring-security é uma simples implementação de autenticação em uma API Restful de animes utilizando Spring
 Security 6.0. A autenticação foi desenvolvida em dois formatos em que estão separadas por branchs diferentes: 
  * Banco de dados via JPA (main)
