@@ -1,4 +1,4 @@
-# Anime API (spring-security)
+# 😆 Anime API (spring-security)
 O spring-security é uma simples implementação de autenticação em uma API Restful de animes utilizando Spring
 Security 6.0. A autenticação foi desenvolvida em dois formatos em que estão separadas por branchs diferentes: 
  * Banco de dados via JPA (main)
@@ -19,7 +19,7 @@ Em geral, para o desenvolvimento deste projeto, abordou-se conceitos como:
 * DTOs
 * Documentação com Swagger-UI
 
-## Tecnologias
+## 👨‍💻 Tecnologias
 As tecnologias utilizadas para o desenvolvimento desse projeto foram:
 * Java 17
 * Spring Boot 3.0.6
@@ -31,7 +31,7 @@ As tecnologias utilizadas para o desenvolvimento desse projeto foram:
 * Lombok
 * H2 Database
 
-## Como rodar
+## 🛠️ Como rodar
 * Compile e rode a aplicação usando maven
 
 ```java 
@@ -47,7 +47,7 @@ mvn spring-boot:run
 
 O aplicativo começará a executar em ``localhost:8080``.
 
-## Rotas
+## 🧭 Rotas
 Essas são as rotas da Anime API:
 
 <img src="./assets/spring-security-routes.png">
